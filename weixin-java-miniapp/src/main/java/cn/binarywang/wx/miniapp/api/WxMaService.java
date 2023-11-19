@@ -22,6 +22,8 @@ public interface WxMaService extends WxService {
    * 获取access_token.
    */
   String GET_ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s";
+  String GET_STABLE_ACCESS_TOKEN = "https://api.weixin.qq.com/cgi-bin/stable_token";
+
 
   /**
    * The constant JSCODE_TO_SESSION_URL.
@@ -343,6 +345,13 @@ public interface WxMaService extends WxService {
   WxMaCloudService getCloudService();
 
   /**
+   * 获取服务端网络接口服务对象
+   *
+   * @return 。internet service
+   */
+  WxMaInternetService getInternetService();
+
+  /**
    * 获取直播接口服务对象
    *
    * @return . live service
@@ -377,41 +386,173 @@ public interface WxMaService extends WxService {
    */
   WxImgProcService getImgProcService();
 
-//  /**
-//   * 返回小程序交易组件-售后服务接口
-//   * @return
-//   */
-//  WxMaShopAfterSaleService getShopAfterSaleService();
-//
-//
-//  /**
-//   * 返回小程序交易组件-物流服务接口
-//   * @return
-//   */
-//  WxMaShopDeliveryService getShopDeliveryService();
+  /**
+   * 返回小程序交易组件-售后服务接口
+   *
+   * @return
+   */
+  WxMaShopAfterSaleService getShopAfterSaleService();
+
+
+  /**
+   * 返回小程序交易组件-物流服务接口
+   *
+   * @return
+   */
+  WxMaShopDeliveryService getShopDeliveryService();
 
 
   /**
    * 返回小程序交易组件-订单服务接口
+   *
    * @return
    */
   WxMaShopOrderService getShopOrderService();
 
   /**
    * 返回小程序交易组件-spu商品服务接口
+   *
    * @return
    */
   WxMaShopSpuService getShopSpuService();
 
   /**
-   * 获取小程序 URL Link服务接口
+   * 返回小程序交易组件-接入申请接口
+   *
+   * @return
+   */
+  WxMaShopRegisterService getShopRegisterService();
+
+  /**
+   * 返回小程序交易组件-商户入驻接口
+   *
+   * @return
+   */
+  WxMaShopAccountService getShopAccountService();
+
+  /**
+   * 小程序交易组件-接入商品前必需接口-类目相关
+   *
+   * @return
+   */
+  WxMaShopCatService getShopCatService();
+
+  /**
+   * 小程序交易组件-接入商品前必需接口-上传图片
+   *
+   * @return
+   */
+  WxMaShopImgService getShopImgService();
+
+  /**
+   * 小程序交易组件-接入商品前必需接口-审核相关接口
+   *
+   * @return
+   */
+  WxMaShopAuditService getShopAuditService();
+
+  /**
+   * 获取小程序Link服务接口
+   *
    * @return
    */
   WxMaLinkService getLinkService();
 
   /**
    * 获取电子发票报销方服务接口
+   *
    * @return
    */
   WxMaReimburseInvoiceService getReimburseInvoiceService();
+
+  /**
+   * 返回设备订阅消息相关接口服务对象
+   *
+   * @return WxMaDeviceSubscribeService plugin service
+   */
+  WxMaDeviceSubscribeService getDeviceSubscribeService();
+
+  /**
+   * 返回小程序广告接入相关接口服务对象
+   *
+   * @return WxMaDeviceSubscribeService plugin service
+   */
+  WxMaMarketingService getMarketingService();
+
+  /**
+   * 返回微信小程序即时配送服务接口.
+   *
+   * @return WxMaImmediateDeliveryService
+   */
+  WxMaImmediateDeliveryService getWxMaImmediateDeliveryService();
+
+
+  /**
+   * 小程序安全风控相关接口服务
+   *
+   * @return safetyRiskControl service
+   */
+  WxMaSafetyRiskControlService getSafetyRiskControlService();
+
+  /**
+   * 分享人接口
+   *
+   * @return WxMaShopSharerService
+   */
+  WxMaShopSharerService getShopSharerService();
+
+  /**
+   * 标准交易组件接口
+   *
+   * @return WxMaProductService
+   */
+  WxMaProductService getProductService();
+
+  /**
+   * 小商店-标准交易组件-订单服务
+   *
+   * @return getProductOrderService
+   */
+  WxMaProductOrderService getProductOrderService();
+
+  /**
+   * 小商店-标准交易组件-优惠券
+   *
+   * @return getWxMaShopCouponService
+   */
+  WxMaShopCouponService getWxMaShopCouponService();
+
+  /**
+   * 小程序支付管理-订单支付
+   *
+   * @return getWxMaShopPayService
+   */
+  WxMaShopPayService getWxMaShopPayService();
+
+  /**
+   * 小程序发货信息管理服务
+   *
+   * @return getWxMaOrderShippingService
+   */
+  WxMaOrderShippingService getWxMaOrderShippingService();
+
+  /**
+   * 小程序openApi管理
+   *
+   * @return getWxMaOpenApiService
+   */
+  WxMaOpenApiService getWxMaOpenApiService();
+  /**
+   * 小程序短剧管理
+   *
+   * @return getWxMaVodService
+   */
+  WxMaVodService getWxMaVodService();
+  /**
+   * 小程序虚拟支付
+   *
+   * @return getWxMaXPayService
+   */
+  WxMaXPayService getWxMaXPayService();
+  WxMaExpressDeliveryReturnService getWxMaExpressDeliveryReturnService();
 }

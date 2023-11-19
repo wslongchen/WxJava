@@ -39,8 +39,11 @@ import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
 
 import static me.chanjar.weixin.mp.enums.WxMpApiUrl.Other.*;
 
@@ -87,7 +90,7 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
   private WxMpTemplateMsgService templateMsgService = new WxMpTemplateMsgServiceImpl(this);
   @Getter
   @Setter
-  private final WxMpSubscribeMsgService subscribeMsgService = new WxMpSubscribeMsgServiceImpl(this);
+  private WxMpSubscribeMsgService subscribeMsgService = new WxMpSubscribeMsgServiceImpl(this);
   @Getter
   @Setter
   private WxMpDeviceService deviceService = new WxMpDeviceServiceImpl(this);
@@ -105,7 +108,7 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
   private WxMpAiOpenService aiOpenService = new WxMpAiOpenServiceImpl(this);
   @Getter
   @Setter
-  private final WxMpWifiService wifiService = new WxMpWifiServiceImpl(this);
+  private WxMpWifiService wifiService = new WxMpWifiServiceImpl(this);
   @Getter
   @Setter
   private WxMpMarketingService marketingService = new WxMpMarketingServiceImpl(this);
@@ -146,7 +149,19 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
   @Setter
   private WxMpReimburseInvoiceService reimburseInvoiceService = new WxMpReimburseInvoiceServiceImpl(this);
 
-  private Map<String, WxMpConfigStorage> configStorageMap;
+  @Getter
+  @Setter
+  private WxMpDraftService draftService = new WxMpDraftServiceImpl(this);
+
+  @Getter
+  @Setter
+  private WxMpFreePublishService freePublishService = new WxMpFreePublishServiceImpl(this);
+
+  @Getter
+  @Setter
+  private Function<String, WxMpConfigStorage> configStorageFunction;
+
+  private Map<String, WxMpConfigStorage> configStorageMap = new HashMap<>();
 
   private int retrySleepMillis = 1000;
   private int maxRetryTimes = 5;
@@ -242,6 +257,55 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
   public String getAccessToken() throws WxErrorException {
     return getAccessToken(false);
   }
+
+  @Override
+  public String getAccessToken(boolean forceRefresh) throws WxErrorException {
+    if (!forceRefresh && !this.getWxMpConfigStorage().isAccessTokenExpired()) {
+      return this.getWxMpConfigStorage().getAccessToken();
+    }
+
+    Lock lock = this.getWxMpConfigStorage().getAccessTokenLock();
+    boolean locked = false;
+    try {
+      do {
+        locked = lock.tryLock(100, TimeUnit.MILLISECONDS);
+        if (!forceRefresh && !this.getWxMpConfigStorage().isAccessTokenExpired()) {
+          return this.getWxMpConfigStorage().getAccessToken();
+        }
+      } while (!locked);
+
+      String response;
+      if (getWxMpConfigStorage().isStableAccessToken()) {
+        response = doGetStableAccessTokenRequest(forceRefresh);
+      } else {
+        response = doGetAccessTokenRequest();
+      }
+      return extractAccessToken(response);
+    } catch (IOException | InterruptedException e) {
+      throw new WxRuntimeException(e);
+    } finally {
+      if (locked) {
+        lock.unlock();
+      }
+    }
+  }
+
+  /**
+   * 通过网络请求获取AccessToken
+   *
+   * @return .
+   * @throws IOException .
+   */
+  protected abstract String doGetAccessTokenRequest() throws IOException;
+
+
+  /**
+   * 通过网络请求获取稳定版接口调用凭据
+   *
+   * @return .
+   * @throws IOException .
+   */
+  protected abstract String doGetStableAccessTokenRequest(boolean forceRefresh) throws IOException;
 
   @Override
   public String shortUrl(String longUrl) throws WxErrorException {
@@ -427,12 +491,12 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
       }
 
       if (error.getErrorCode() != 0) {
-        log.error("\n【请求地址】: {}\n【请求参数】：{}\n【错误信息】：{}", uriWithAccessToken, dataForLog, error);
+        log.warn("\n【请求地址】: {}\n【请求参数】：{}\n【错误信息】：{}", uriWithAccessToken, dataForLog, error);
         throw new WxErrorException(error, e);
       }
       return null;
     } catch (IOException e) {
-      log.error("\n【请求地址】: {}\n【请求参数】：{}\n【异常信息】：{}", uriWithAccessToken, dataForLog, e.getMessage());
+      log.warn("\n【请求地址】: {}\n【请求参数】：{}\n【异常信息】：{}", uriWithAccessToken, dataForLog, e.getMessage());
       throw new WxErrorException(e);
     }
   }
@@ -461,17 +525,29 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
   @Override
   public void setWxMpConfigStorage(WxMpConfigStorage wxConfigProvider) {
     final String defaultMpId = wxConfigProvider.getAppId();
+    if (defaultMpId == null) {
+      throw new WxRuntimeException("appid不能设置为null");
+    }
+
     this.setMultiConfigStorages(ImmutableMap.of(defaultMpId, wxConfigProvider), defaultMpId);
   }
 
   @Override
   public void setMultiConfigStorages(Map<String, WxMpConfigStorage> configStorages) {
+    if (configStorages.isEmpty()) {
+      return;
+    }
     this.setMultiConfigStorages(configStorages, configStorages.keySet().iterator().next());
   }
 
   @Override
   public void setMultiConfigStorages(Map<String, WxMpConfigStorage> configStorages, String defaultMpId) {
-    this.configStorageMap = Maps.newHashMap(configStorages);
+    // 防止覆盖配置
+    if(this.configStorageMap != null) {
+      this.configStorageMap.putAll(configStorages);
+    } else {
+      this.configStorageMap = Maps.newHashMap(configStorages);
+    }
     WxMpConfigStorageHolder.set(defaultMpId);
     this.initHttp();
   }
@@ -479,7 +555,11 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
   @Override
   public void addConfigStorage(String mpId, WxMpConfigStorage configStorages) {
     synchronized (this) {
-      if (this.configStorageMap == null) {
+      /*
+       * 因为commit 2aa27cf12d 默认初始化了configStorageMap，导致使用此方法无法进入if从而触发initHttp()，
+       * 就会出现HttpClient报NullPointException
+       */
+      if (this.configStorageMap == null || this.configStorageMap.isEmpty()) {
         this.setWxMpConfigStorage(configStorages);
       } else {
         WxMpConfigStorageHolder.set(mpId);
@@ -509,21 +589,43 @@ public abstract class BaseWxMpServiceImpl<H, P> implements WxMpService, RequestH
 
   @Override
   public WxMpService switchoverTo(String mpId) {
+    return switchoverTo(mpId, configStorageFunction);
+  }
+
+  @Override
+  public WxMpService switchoverTo(String mpId, Function<String, WxMpConfigStorage> func) {
     if (this.configStorageMap.containsKey(mpId)) {
       WxMpConfigStorageHolder.set(mpId);
       return this;
     }
-
+    if (func != null) {
+      WxMpConfigStorage storage = func.apply(mpId);
+      if (storage != null) {
+        this.addConfigStorage(mpId, storage);
+        return this;
+      }
+    }
     throw new WxRuntimeException(String.format("无法找到对应【%s】的公众号配置信息，请核实！", mpId));
   }
 
   @Override
   public boolean switchover(String mpId) {
+    return switchover(mpId, configStorageFunction);
+  }
+
+  @Override
+  public boolean switchover(String mpId, Function<String, WxMpConfigStorage> func) {
     if (this.configStorageMap.containsKey(mpId)) {
       WxMpConfigStorageHolder.set(mpId);
       return true;
     }
-
+    if (func != null) {
+      WxMpConfigStorage storage = func.apply(mpId);
+      if (storage != null) {
+        this.addConfigStorage(mpId, storage);
+        return true;
+      }
+    }
     log.error("无法找到对应【{}】的公众号配置信息，请核实！", mpId);
     return false;
   }

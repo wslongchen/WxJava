@@ -11,7 +11,7 @@ import java.io.Serializable;
  * 服务时间范围.
  *
  * @author doger.wang
- * @date 2020-05-19
+ * created on  2020-05-19
  */
 @Data
 @NoArgsConstructor
@@ -26,4 +26,16 @@ public class TimeRange implements Serializable {
   private String startTime;
   @SerializedName("end_time")
   private String endTime;
+
+  /**
+   * 服务开始时间备注
+   */
+  @SerializedName("start_time_remark")
+  private String startTimeRemark;
+
+  /**
+   * 服务结束时间备注
+   */
+  @SerializedName("end_time_remark")
+  private String endTimeRemark;
 }

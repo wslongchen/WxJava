@@ -10,8 +10,9 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author yqx
- * @date 2020/3/116
+ * The type Wx cp user external group chat info.
+ *
+ * @author yqx  created on  2020/3/116
  */
 @Getter
 @Setter
@@ -20,6 +21,9 @@ public class WxCpUserExternalGroupChatInfo extends WxCpBaseResp {
   @SerializedName("group_chat")
   private GroupChat groupChat;
 
+  /**
+   * The type Group chat.
+   */
   @Getter
   @Setter
   public static class GroupChat implements Serializable {
@@ -47,6 +51,9 @@ public class WxCpUserExternalGroupChatInfo extends WxCpBaseResp {
     private List<GroupAdmin> adminList;
   }
 
+  /**
+   * The type Group member.
+   */
   @Getter
   @Setter
   public static class GroupMember implements Serializable {
@@ -67,10 +74,10 @@ public class WxCpUserExternalGroupChatInfo extends WxCpBaseResp {
     private Long joinTime;
 
     /**
-    * 外部联系人在微信开放平台的唯一身份标识（微信unionid）
-    * 通过此字段企业可将外部联系人与公众号/小程序用户关联起来
-    * 仅当群成员类型是微信用户（包括企业成员未添加好友），且企业或第三方服务商绑定了微信开发者ID有此字段
-    */
+     * 外部联系人在微信开放平台的唯一身份标识（微信unionid）
+     * 通过此字段企业可将外部联系人与公众号/小程序用户关联起来
+     * 仅当群成员类型是微信用户（包括企业成员未添加好友），且企业或第三方服务商绑定了微信开发者ID有此字段
+     */
     @SerializedName("unionid")
     private String unionId;
 
@@ -82,6 +89,12 @@ public class WxCpUserExternalGroupChatInfo extends WxCpBaseResp {
      */
     @SerializedName("join_scene")
     private int joinScene;
+
+    /**
+     * 该成员入群方式对应的state参数
+     */
+    @SerializedName("state")
+    private String state;
 
     /**
      * 在群里的昵称
@@ -104,9 +117,12 @@ public class WxCpUserExternalGroupChatInfo extends WxCpBaseResp {
     private Invitor invitor;
   }
 
+  /**
+   * The type Invitor.
+   */
   @Getter
   @Setter
-  public static class Invitor{
+  public static class Invitor {
 
     /**
      * 邀请者的userid
@@ -115,9 +131,12 @@ public class WxCpUserExternalGroupChatInfo extends WxCpBaseResp {
     private String userId;
   }
 
+  /**
+   * The type Group admin.
+   */
   @Getter
   @Setter
-  public static class GroupAdmin{
+  public static class GroupAdmin {
 
     /**
      * 群管理员userid
@@ -126,6 +145,12 @@ public class WxCpUserExternalGroupChatInfo extends WxCpBaseResp {
     private String userId;
   }
 
+  /**
+   * From json wx cp user external group chat info.
+   *
+   * @param json the json
+   * @return the wx cp user external group chat info
+   */
   public static WxCpUserExternalGroupChatInfo fromJson(String json) {
     return WxCpGsonBuilder.create().fromJson(json, WxCpUserExternalGroupChatInfo.class);
   }

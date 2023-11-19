@@ -1,9 +1,11 @@
 package cn.binarywang.wx.miniapp.bean.urllink;
 
-import cn.binarywang.wx.miniapp.json.WxMaGsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -16,6 +18,9 @@ import java.io.Serializable;
  */
 @Data
 @Builder
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class GenerateUrlLinkRequest implements Serializable {
 
   private static final long serialVersionUID = -2183685760797791910L;
@@ -35,6 +40,15 @@ public class GenerateUrlLinkRequest implements Serializable {
    * </pre>
    */
   private String query;
+
+  /**
+   * 要打开的小程序版本。正式版为"release"，体验版为"trial"，开发版为"develop"，仅在微信外打开时生效。
+   * <pre>
+   * 是否必填： 否
+   * </pre>
+   */
+  @SerializedName("env_version")
+  private String envVersion = "release";
 
   /**
    * 生成的 URL Link 类型，到期失效：true，永久有效：false
@@ -62,7 +76,7 @@ public class GenerateUrlLinkRequest implements Serializable {
    * </pre>
    */
   @SerializedName("expire_time")
-  private Integer expireTime;
+  private Long expireTime;
 
   /**
    * 到期失效的URL Link的失效间隔天数。生成的到期失效URL Link在该间隔时间到达前有效。最长间隔天数为365天。expire_type 为 1 必填

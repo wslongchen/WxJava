@@ -1,5 +1,6 @@
 package com.github.binarywang.wxpay.bean.profitsharing;
 
+import com.github.binarywang.wxpay.bean.profitsharing.result.ProfitSharingQueryResult;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 测试.
  *
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
- * @date 2020-03-22
+ * created on  2020-03-22
  */
 @Test
 public class ProfitSharingQueryResultTest {

@@ -67,13 +67,13 @@ public class WxMaCodeServiceImpl implements WxMaCodeService {
   }
 
   @Override
-  public List<WxMaCategory> getCategory() throws WxErrorException {
+  public List<WxMaCodeSubmitAuditItem> getCategory() throws WxErrorException {
     String responseContent = this.service.get(GET_CATEGORY_URL, null);
     JsonObject jsonObject = GsonParser.parse(responseContent);
     boolean hasCategoryList = jsonObject.has("category_list");
     if (hasCategoryList) {
       return WxMaGsonBuilder.create().fromJson(jsonObject.getAsJsonArray("category_list"),
-        new TypeToken<List<WxMaCategory>>() {
+        new TypeToken<List<WxMaCodeSubmitAuditItem>>() {
         }.getType());
     } else {
       return null;
@@ -136,6 +136,12 @@ public class WxMaCodeServiceImpl implements WxMaCodeService {
   public WxMaCodeVersionDistribution getSupportVersion() throws WxErrorException {
     String responseContent = this.service.post(GET_SUPPORT_VERSION_URL, "{}");
     return WxMaCodeVersionDistribution.fromJson(responseContent);
+  }
+
+  @Override
+  public WxMaCodeVersionInfo getVersionInfo() throws WxErrorException {
+    String responseContent = this.service.post(GET_VERSION_INFO_URL, "{}");
+    return WxMaCodeVersionInfo.fromJson(responseContent);
   }
 
   @Override

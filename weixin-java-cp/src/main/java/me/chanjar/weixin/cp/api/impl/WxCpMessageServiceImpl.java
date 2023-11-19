@@ -1,6 +1,7 @@
 package me.chanjar.weixin.cp.api.impl;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.cp.api.WxCpMessageService;
@@ -12,8 +13,7 @@ import me.chanjar.weixin.cp.util.json.WxCpGsonBuilder;
 /**
  * 消息推送接口实现类.
  *
- * @author <a href="https://github.com/binarywang">Binary Wang</a>
- * @date 2020-08-30
+ * @author <a href="https://github.com/binarywang">Binary Wang</a> created on  2020-08-30
  */
 @RequiredArgsConstructor
 public class WxCpMessageServiceImpl implements WxCpMessageService {
@@ -46,4 +46,23 @@ public class WxCpMessageServiceImpl implements WxCpMessageService {
     return WxCpLinkedCorpMessageSendResult.fromJson(this.cpService.post(this.cpService.getWxCpConfigStorage()
       .getApiUrl(Message.LINKEDCORP_MESSAGE_SEND), message.toJson()));
   }
+
+  @Override
+  public WxCpSchoolContactMessageSendResult sendSchoolContactMessage(WxCpSchoolContactMessage message) throws WxErrorException {
+    if (null == message.getAgentId()) {
+      message.setAgentId(this.cpService.getWxCpConfigStorage().getAgentId());
+    }
+
+    return WxCpSchoolContactMessageSendResult.fromJson(this.cpService.post(this.cpService.getWxCpConfigStorage()
+      .getApiUrl(Message.EXTERNAL_CONTACT_MESSAGE_SEND), message.toJson()));
+  }
+
+  @Override
+  public void recall(String msgId) throws WxErrorException {
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.addProperty("msgid", msgId);
+    String apiUrl = this.cpService.getWxCpConfigStorage().getApiUrl(Message.MESSAGE_RECALL);
+    this.cpService.post(apiUrl, jsonObject.toString());
+  }
+
 }

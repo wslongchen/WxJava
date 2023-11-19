@@ -1,8 +1,12 @@
 package me.chanjar.weixin.cp.bean.external;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.*;
-import me.chanjar.weixin.cp.bean.external.msg.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import me.chanjar.weixin.cp.bean.external.msg.Attachment;
+import me.chanjar.weixin.cp.bean.external.msg.Text;
 import me.chanjar.weixin.cp.util.json.WxCpGsonBuilder;
 
 import java.io.Serializable;
@@ -11,8 +15,7 @@ import java.util.List;
 /**
  * 新客户欢迎语.
  *
- * @author <a href="https://github.com/binarywang">Binary Wang</a>
- * @date 2020-08-16
+ * @author <a href="https://github.com/binarywang">Binary Wang</a> created on  2020-08-16
  */
 @Data
 @Builder
@@ -28,6 +31,11 @@ public class WxCpWelcomeMsg implements Serializable {
 
   private List<Attachment> attachments;
 
+  /**
+   * To json string.
+   *
+   * @return the string
+   */
   public String toJson() {
     return WxCpGsonBuilder.create().toJson(this);
   }

@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 明细.
  *
  * @author doger.wang
- * @date 2020-05-19
+ * created on  2020-05-19
  */
 @Data
 @NoArgsConstructor
@@ -33,4 +34,6 @@ public class Detail implements Serializable {
   private String paidTime;
   @SerializedName("transaction_id")
   private String transactionId;
+  @SerializedName("promotion_detail")
+  private List<PromotionDetail> promotionDetail;
 }

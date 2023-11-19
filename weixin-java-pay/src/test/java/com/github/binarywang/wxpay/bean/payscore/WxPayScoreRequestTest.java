@@ -4,7 +4,7 @@ import org.testng.annotations.Test;
 
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
- * @date 2020-07-11
+ * created on  2020-07-11
  */
 public class WxPayScoreRequestTest {
   @Test
@@ -14,7 +14,7 @@ public class WxPayScoreRequestTest {
       .appid("123")
       .serviceId("345")
       .serviceIntroduction("租借服务")
-      .timeRange(new TimeRange("OnAccept", "20200520225840"))
+      .timeRange(new TimeRange("20230901011023", "20230930235959","开始时间","结束时间"))
       .build();
     System.out.println(request.toJson());
     /*    {

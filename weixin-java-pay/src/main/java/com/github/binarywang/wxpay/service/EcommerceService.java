@@ -15,14 +15,14 @@ import java.io.InputStream;
  * </pre>
  *
  * @author cloudX
- * @date 2020 /08/17
+ * created on  2020 /08/17
  */
 public interface EcommerceService {
   /**
    * <pre>
    * 二级商户进件API
    * 接口地址: https://api.mch.weixin.qq.com/v3/ecommerce/applyments/
-   * 文档地址: https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/ecommerce/applyments/chapter3_1.shtml
+   * 文档地址: https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter7_1_8.shtml
    *
    * </pre>
    *
@@ -217,6 +217,19 @@ public interface EcommerceService {
 
   /**
    * <pre>
+   * 二级商户号账户实时余额
+   * 文档地址: https://pay.weixin.qq.com/wiki/doc/apiv3_partner/Offline/apis/chapter4_3_11.shtml
+   * </pre>
+   *
+   * @param subMchid 二级商户号
+   * @param accountType 账户类型
+   * @return 返回数据 fund balance result
+   * @throws WxPayException the wx pay exception
+   */
+  FundBalanceResult subNowBalance(String subMchid, SpAccountTypeEnum accountType) throws WxPayException;
+
+  /**
+   * <pre>
    * 二级商户号账户日终余额
    * 文档地址: https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/amount.shtml
    * </pre>
@@ -251,6 +264,18 @@ public interface EcommerceService {
    * @throws WxPayException the wx pay exception
    */
   ProfitSharingResult queryProfitSharing(ProfitSharingQueryRequest request) throws WxPayException;
+
+  /**
+   * <pre>
+   * 查询订单剩余待分金额API
+   * 文档地址: https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter7_4_9.shtml
+   * </pre>
+   *
+   * @param request 查询订单剩余待分金额请求
+   * @return 返回数据 profit sharing UnSplitAmount result
+   * @throws WxPayException the wx pay exception
+   */
+  ProfitSharingOrdersUnSplitAmountResult queryProfitSharingOrdersUnsplitAmount(ProfitSharingOrdersUnSplitAmountRequest request) throws WxPayException;
 
   /**
    * <pre>

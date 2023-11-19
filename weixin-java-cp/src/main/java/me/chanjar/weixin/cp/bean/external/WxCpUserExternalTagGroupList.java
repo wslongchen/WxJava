@@ -11,15 +11,21 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * The type Wx cp user external tag group list.
  *
+ * @author huangxm129
  */
 @Getter
 @Setter
 public class WxCpUserExternalTagGroupList extends WxCpBaseResp {
+  private static final long serialVersionUID = -3349321791821450679L;
 
   @SerializedName("tag_group")
   private List<WxCpUserExternalTagGroupList.TagGroup> tagGroupList;
 
+  /**
+   * The type Tag group.
+   */
   @Getter
   @Setter
   public static class TagGroup implements Serializable {
@@ -35,7 +41,7 @@ public class WxCpUserExternalTagGroupList extends WxCpBaseResp {
     private Long createTime;
 
     @SerializedName("order")
-    private Integer order;
+    private Long order;
 
     @SerializedName("deleted")
     private Boolean deleted;
@@ -44,6 +50,9 @@ public class WxCpUserExternalTagGroupList extends WxCpBaseResp {
     @SerializedName("tag")
     private List<Tag> tag;
 
+    /**
+     * The type Tag.
+     */
     @Getter
     @Setter
     public static class Tag implements Serializable {
@@ -59,13 +68,13 @@ public class WxCpUserExternalTagGroupList extends WxCpBaseResp {
       private String name;
 
       @SerializedName("create_time")
-      private Long  createTime;
+      private Long createTime;
 
       @SerializedName("order")
-      private Integer  order;
+      private Long order;
 
       @SerializedName("deleted")
-      private Boolean  deleted;
+      private Boolean deleted;
 
     }
   }
@@ -74,6 +83,12 @@ public class WxCpUserExternalTagGroupList extends WxCpBaseResp {
     return WxGsonBuilder.create().toJson(this);
   }
 
+  /**
+   * From json wx cp user external tag group list.
+   *
+   * @param json the json
+   * @return the wx cp user external tag group list
+   */
   public static WxCpUserExternalTagGroupList fromJson(String json) {
     return WxCpGsonBuilder.create().fromJson(json, WxCpUserExternalTagGroupList.class);
   }

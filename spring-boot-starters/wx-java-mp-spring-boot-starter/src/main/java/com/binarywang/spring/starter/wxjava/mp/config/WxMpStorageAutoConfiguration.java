@@ -14,23 +14,23 @@ import me.chanjar.weixin.mp.config.WxMpConfigStorage;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolAbstract;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.jedis.util.Pool;
 
 import java.util.Set;
 
 /**
  * 微信公众号存储策略自动配置.
  *
- * @author someone
+ * @author Luo
  */
 @Slf4j
 @Configuration
@@ -39,12 +39,6 @@ public class WxMpStorageAutoConfiguration {
   private final ApplicationContext applicationContext;
 
   private final WxMpProperties wxMpProperties;
-
-  @Value("${wx.mp.config-storage.redis.host:")
-  private String redisHost;
-
-  @Value("${wx.mp.configStorage.redis.host:")
-  private String redisHost2;
 
   @Bean
   @ConditionalOnMissingBean(WxMpConfigStorage.class)
@@ -80,15 +74,16 @@ public class WxMpStorageAutoConfiguration {
   }
 
   private WxMpConfigStorage jedisConfigStorage() {
-    JedisPoolAbstract jedisPool;
-    if (StringUtils.isNotEmpty(redisHost) || StringUtils.isNotEmpty(redisHost2)) {
+    Pool<Jedis> jedisPool;
+    if (wxMpProperties.getConfigStorage() != null && wxMpProperties.getConfigStorage().getRedis() != null
+      && StringUtils.isNotEmpty(wxMpProperties.getConfigStorage().getRedis().getHost())) {
       jedisPool = getJedisPool();
     } else {
       jedisPool = applicationContext.getBean(JedisPool.class);
     }
     WxRedisOps redisOps = new JedisWxRedisOps(jedisPool);
     WxMpRedisConfigImpl wxMpRedisConfig = new WxMpRedisConfigImpl(redisOps,
-        wxMpProperties.getConfigStorage().getKeyPrefix());
+      wxMpProperties.getConfigStorage().getKeyPrefix());
     setWxMpInfo(wxMpRedisConfig);
     return wxMpRedisConfig;
   }
@@ -114,7 +109,7 @@ public class WxMpStorageAutoConfiguration {
 
     WxRedisOps redisOps = new RedisTemplateWxRedisOps(redisTemplate);
     WxMpRedisConfigImpl wxMpRedisConfig = new WxMpRedisConfigImpl(redisOps,
-        wxMpProperties.getConfigStorage().getKeyPrefix());
+      wxMpProperties.getConfigStorage().getKeyPrefix());
 
     setWxMpInfo(wxMpRedisConfig);
     return wxMpRedisConfig;
@@ -136,7 +131,7 @@ public class WxMpStorageAutoConfiguration {
     }
   }
 
-  private JedisPoolAbstract getJedisPool() {
+  private Pool<Jedis> getJedisPool() {
     RedisProperties redis = wxMpProperties.getConfigStorage().getRedis();
 
     JedisPoolConfig config = new JedisPoolConfig();
@@ -160,6 +155,6 @@ public class WxMpStorageAutoConfiguration {
     }
 
     return new JedisPool(config, redis.getHost(), redis.getPort(), redis.getTimeout(), redis.getPassword(),
-        redis.getDatabase());
+      redis.getDatabase());
   }
 }

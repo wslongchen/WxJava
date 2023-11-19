@@ -1,5 +1,7 @@
 package com.github.binarywang.wxpay.bean.notify;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,9 +10,13 @@ import java.io.Serializable;
 /**
  * 微信通知接口头部信息，需要做签名验证
  * 文档地址: https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay4_1.shtml
+ *
+ * @author thinstar
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class SignatureHeader implements Serializable {
   private static final long serialVersionUID = -1L;
   /**
